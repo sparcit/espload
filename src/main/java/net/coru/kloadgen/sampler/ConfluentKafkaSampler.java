@@ -80,6 +80,7 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -187,9 +188,17 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             }
             props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
             context.getJMeterVariables().get(AVRO_SUBJECT_NAME);
-            generator.setUpGeneratorFromRegistry(
+
+/*            generator.setUpGeneratorFromRegistry(
                 JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
-                (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+                (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));*/
+
+            JMeterVariables var = JMeterContextService.getContext().getVariables();
+           Object testSchema =  JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES);
+            generator.setUpGenerator(
+                    JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
+                    (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+
         } else {
             generator.setUpGenerator(
                 JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
@@ -268,23 +277,27 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
                 Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
                     if (e != null) {
                         log.error("Send failed for record {}", producerRecord, e);
+//                        getNewLogger().error("Send failed for record {}", producerRecord, e);
                         throw new KLoadGenException("Failed to sent message due ", e);
                     }
                 });
 
                 log.info("Send message to body: {}", producerRecord.value());
+//                getNewLogger().info("Send message to body: {}", producerRecord.value());
                 sampleResult.setResponseData(result.get().toString(), StandardCharsets.UTF_8.name());
                 sampleResult.setSuccessful(true);
                 sampleResult.sampleEnd();
 
             } catch (Exception e) {
                 log.error("Failed to send message", e);
+//                getNewLogger().error("Failed to send message", e);
                 sampleResult.setResponseData(e.getMessage(), StandardCharsets.UTF_8.name());
                 sampleResult.setSuccessful(false);
                 sampleResult.sampleEnd();
             }
         } else {
             log.error("Failed to Generate message");
+//            getNewLogger().error("Failed to Generate message");
             sampleResult.setResponseData("Failed to Generate message", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();

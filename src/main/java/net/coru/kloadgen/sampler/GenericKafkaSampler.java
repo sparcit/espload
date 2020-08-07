@@ -219,6 +219,7 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
             try {
                 if (key_message_flag) {
                     producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal.getGenericRecord());
+//                    producerRecord = new ProducerRecord(topic, msg_key_placeHolder, messageVal);
                 } else {
                     producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
                 }
@@ -235,24 +236,27 @@ public class GenericKafkaSampler extends AbstractJavaSamplerClient implements Se
                 Future<RecordMetadata> result = producer.send(producerRecord, (metadata, e) -> {
                     if (e != null) {
                         log.error("Send failed for record {}", producerRecord, e);
+//                        getNewLogger().error("Send failed for record {}", producerRecord, e);
                         throw new KLoadGenException("Failed to sent message due ", e);
                     }
                 });
 
                 log.info("Send message to body: {}", producerRecord.value());
-
+//                getNewLogger().info("Send message to body: {}", producerRecord.value());
                 sampleResult.setResponseData(result.get().toString(), StandardCharsets.UTF_8.name());
                 sampleResult.setSuccessful(true);
                 sampleResult.sampleEnd();
 
             } catch (Exception e) {
                 log.error("Failed to send message", e);
+//                getNewLogger().error("Failed to send message", e);
                 sampleResult.setResponseData(e.getMessage() != null ? e.getMessage() : "", StandardCharsets.UTF_8.name());
                 sampleResult.setSuccessful(false);
                 sampleResult.sampleEnd();
             }
         } else {
             log.error("Failed to Generate message");
+//            getNewLogger().error("Failed to Generate message");
             sampleResult.setResponseData("Failed to Generate message", StandardCharsets.UTF_8.name());
             sampleResult.setSuccessful(false);
             sampleResult.sampleEnd();

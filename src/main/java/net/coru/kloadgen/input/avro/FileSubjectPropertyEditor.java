@@ -15,14 +15,10 @@ import java.beans.PropertyEditorSupport;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.extractor.SchemaExtractor;
@@ -32,6 +28,7 @@ import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.avro.Schema;
 import org.apache.avro.Schema.Type;
 import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jmeter.gui.ClearGui;
 import org.apache.jmeter.gui.GuiPackage;
 import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
@@ -45,6 +42,8 @@ import org.apache.jmeter.util.JMeterUtils;
 public class FileSubjectPropertyEditor extends PropertyEditorSupport implements ActionListener, TestBeanPropertyEditor, ClearGui {
 
   private JComboBox<String> subjectNameComboBox;
+
+//  private final JEditorPane avroSchemaPane = new JEditorPane();
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
@@ -83,6 +82,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     panel.add(subjectNameComboBox);
     AutoCompletion.enable(subjectNameComboBox);
     this.subjectNameComboBox.addActionListener(this);
+//    panel.add(avroSchemaPane, BorderLayout.SOUTH);
   }
   public void actionFileChooser(ActionEvent event) {
 
@@ -95,11 +95,16 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
         subjectNameComboBox.removeAllItems();
         if (Type.UNION == parserSchema.getType()) {
           Iterable<Schema> schemaList = IterableUtils.filteredIterable(parserSchema.getTypes(), t -> t.getType() == RECORD);
+//          List<String> subjects = new ArrayList<>();
           for (Schema types : schemaList) {
             subjectNameComboBox.addItem(types.getName());
+//            subjects.add(types.getName());
           }
+//          JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_SUBJECTS, StringUtils.join(subjects, ","));
         } else {
+//          String subject = parserSchema.getName();
           subjectNameComboBox.addItem(parserSchema.getName());
+//          JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_SUBJECTS, subject);
         }
       } catch (IOException e) {
         JOptionPane.showMessageDialog(panel, "Can't read a file : " + e.getMessage(), "ERROR: Failed to retrieve properties!",
@@ -153,7 +158,8 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
           for (PropertyEditor propertyEditor : propertyEditors) {
             if (propertyEditor instanceof TableEditor) {
               propertyEditor.setValue(attributeList);
-            } else if (propertyEditor instanceof SchemaConverterPropertyEditor) {
+            }
+            if (propertyEditor instanceof SchemaConverterPropertyEditor) {
               propertyEditor.setValue(selectedSchema);
             }
           }

@@ -36,6 +36,7 @@ public class FileSerializedConfigElementBeanInfo extends BeanInfoSupport {
     avroSchemaProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
     avroSchemaProps.setValue(DEFAULT, "");
     avroSchemaProps.setValue(NOT_EXPRESSION, Boolean.FALSE);
+    avroSchemaProps.setValue(MULTILINE,Boolean.TRUE);
 
     TypeEditor tableEditor = TypeEditor.TableEditor;
     PropertyDescriptor tableProperties = property(SCHEMA_PROPERTIES, tableEditor);

@@ -195,9 +195,9 @@ public class KafkaSampler extends AbstractJavaSamplerClient implements Serializa
             ProducerRecord<String, Object> producerRecord;
             try {
                 if (key_message_flag) {
-                    producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal);
+                    producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal.getGenericRecord());
                 } else {
-                    producerRecord = new ProducerRecord<>(topic, messageVal);
+                    producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
                 }
 
                 for (HeaderMapping kafkaHeader : kafkaHeaders) {

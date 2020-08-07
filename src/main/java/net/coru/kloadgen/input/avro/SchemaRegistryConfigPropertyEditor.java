@@ -32,10 +32,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
+
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.coru.kloadgen.model.PropertyMapping;
@@ -48,6 +46,7 @@ import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TestBeanGUI;
 import org.apache.jmeter.testbeans.gui.TestBeanPropertyEditor;
 import org.apache.jmeter.threads.JMeterContextService;
+import org.apache.jmeter.visualizers.SearchTextExtension;
 
 
 @Slf4j
@@ -56,6 +55,8 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     private final JTextField schemaRegistryUrl = new JTextField();
 
     private final JButton testSchemaRepoBtn = new JButton("Test Registry");
+
+    private final JEditorPane listofSchemas = new JEditorPane();
 
     private final JPanel panel = new JPanel();
 
@@ -84,6 +85,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
 
         panel.add(testSchemaRepoBtn, BorderLayout.AFTER_LINE_ENDS);
         this.testSchemaRepoBtn.addActionListener(this);
+        panel.add(listofSchemas, BorderLayout.SOUTH);
     }
 
     @Override
@@ -165,6 +167,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
             List<String> subjects = new ArrayList<>(schemaRegistryClient.getAllSubjects());
             JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_URL, schemaRegistryUrl.getText());
             JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_SUBJECTS, StringUtils.join(subjects, ","));
+            listofSchemas.setText(StringUtils.join(subjects, "\n"));
             if (FLAG_YES.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 JMeterContextService.getContext().getProperties().setProperty(SCHEMA_REGISTRY_AUTH_FLAG, FLAG_YES);
                 if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE.equalsIgnoreCase(schemaProperties.get(SCHEMA_REGISTRY_AUTH_KEY))) {
@@ -201,6 +204,7 @@ public class SchemaRegistryConfigPropertyEditor extends PropertyEditorSupport im
     @Override
     public void clearGui() {
         this.schemaRegistryUrl.setText("");
+        this.listofSchemas.setText("");
     }
 
     private Map<String, String> fromListToPropertiesMap(List<PropertyMapping> schemaProperties) {

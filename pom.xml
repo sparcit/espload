@@ -27,7 +27,7 @@
         <groupId>org.eluder.coveralls</groupId>
         <version>4.3.0</version>
       </plugin>
-      <plugin>
+<!--      <plugin>
         <artifactId>cobertura-maven-plugin</artifactId>
         <configuration>
           <check/>
@@ -48,7 +48,7 @@
         </executions>
         <groupId>org.codehaus.mojo</groupId>
         <version>2.7</version>
-      </plugin>
+      </plugin>-->
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <groupId>org.apache.maven.plugins</groupId>
@@ -78,7 +78,7 @@
       <version>${jmeter.version}</version>
     </dependency>
     <dependency>
-      <artifactId>kafka_2.11</artifactId>
+      <artifactId>kafka_2.13</artifactId>
       <exclusions>
         <exclusion>
           <artifactId>slf4j-log4j12</artifactId>
@@ -91,6 +91,11 @@
       </exclusions>
       <groupId>org.apache.kafka</groupId>
       <version>${kafka.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>annotations</artifactId>
+      <version>3.0.1</version>
     </dependency>
     <dependency>
       <artifactId>guava</artifactId>
@@ -106,6 +111,11 @@
       <artifactId>avro</artifactId>
       <groupId>org.apache.avro</groupId>
       <version>${avro.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>2.11.2</version>
     </dependency>
     <dependency>
       <artifactId>lombok</artifactId>
@@ -145,7 +155,7 @@
     </dependency>
     <!-- Options -->
     <dependency>
-      <artifactId>kafka_2.11</artifactId>
+      <artifactId>kafka_2.13</artifactId>
       <classifier>test</classifier>
       <groupId>org.apache.kafka</groupId>
       <scope>test</scope>
@@ -439,11 +449,11 @@
     <jaxb-api.version>2.3.0</jaxb-api.version>
     <jdk.version>1.8</jdk.version>
     <jmeter.lib.scope>provided</jmeter.lib.scope>
-    <jmeter.version>5.2.1</jmeter.version>
+    <jmeter.version>5.3</jmeter.version>
     <json-path.version>2.4.0</json-path.version>
     <junit-jupiter-api.version>5.5.2</junit-jupiter-api.version>
     <kafka-schema-registry-client.version>5.3.1</kafka-schema-registry-client.version>
-    <kafka.version>2.3.0</kafka.version>
+    <kafka.version>2.5.0</kafka.version>
     <lombok.version>1.18.10</lombok.version>
     <minimal-json.version>0.9.4</minimal-json.version>
     <mockito-core.version>3.0.0</mockito-core.version>
