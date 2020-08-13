@@ -7,7 +7,9 @@ import java.beans.PropertyDescriptor;
 import net.coru.kloadgen.input.avro.SchemaRegistryConfigPropertyEditor;
 import net.coru.kloadgen.model.PropertyMapping;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
+import org.apache.jmeter.testbeans.gui.GenericTestBeanCustomizer;
 import org.apache.jmeter.testbeans.gui.TableEditor;
+import org.apache.jmeter.testbeans.gui.TextAreaEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
@@ -16,12 +18,14 @@ public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
 
     private static final String SCHEMA_REGISTRY_PROPERTIES = "schemaRegistryProperties";
 
+    private static final String LIST_OF_SCHEMAS = "listofSchemas";
+
     public SchemaRegistryConfigElementBeanInfo() {
 
         super(SchemaRegistryConfigElement.class);
 
         createPropertyGroup("schema_registry_config", new String[]{
-            SCHEMA_REGISTRY_URL, SCHEMA_REGISTRY_PROPERTIES
+            SCHEMA_REGISTRY_URL, SCHEMA_REGISTRY_PROPERTIES, LIST_OF_SCHEMAS
         });
 
         PropertyDescriptor schemaRegistryUrl = property(SCHEMA_REGISTRY_URL);
@@ -39,6 +43,11 @@ public class SchemaRegistryConfigElementBeanInfo extends BeanInfoSupport {
         tableProperties.setValue(DEFAULT, DEFAULTS);
         tableProperties.setValue(NOT_UNDEFINED, Boolean.TRUE);
         tableProperties.setValue(NOT_EXPRESSION, Boolean.FALSE);
+
+        PropertyDescriptor schemaList = property(LIST_OF_SCHEMAS);
+        schemaList.setPropertyEditorClass(TextAreaEditor.class);
+        schemaList.setValue(MULTILINE, Boolean.TRUE);
+
 
     }
 }

@@ -172,37 +172,41 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         Properties properties = JMeterContextService.getContext().getProperties();
         if (Objects.nonNull(properties.getProperty(SCHEMA_REGISTRY_URL))) {
             props.put(SCHEMA_REGISTRY_URL,
-                properties.getProperty(SCHEMA_REGISTRY_URL));
+                    properties.getProperty(SCHEMA_REGISTRY_URL));
 
             if (FLAG_YES.equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_FLAG))) {
                 if (SCHEMA_REGISTRY_AUTH_BASIC_TYPE
-                    .equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
+                        .equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
                     props.put(BASIC_AUTH_CREDENTIALS_SOURCE,
-                        properties.getProperty(BASIC_AUTH_CREDENTIALS_SOURCE));
+                            properties.getProperty(BASIC_AUTH_CREDENTIALS_SOURCE));
                     props.put(USER_INFO_CONFIG, properties.getProperty(USER_INFO_CONFIG));
                 } else if (SCHEMA_REGISTRY_AUTH_BEARER_KEY.equals(properties.getProperty(SCHEMA_REGISTRY_AUTH_KEY))) {
                     props.put(BEARER_AUTH_CREDENTIALS_SOURCE,
-                        properties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
+                            properties.getProperty(BEARER_AUTH_CREDENTIALS_SOURCE));
                     props.put(BEARER_AUTH_TOKEN_CONFIG, properties.getProperty(BEARER_AUTH_TOKEN_CONFIG));
                 }
             }
             props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
-            context.getJMeterVariables().get(AVRO_SUBJECT_NAME);
 
-/*            generator.setUpGeneratorFromRegistry(
-                JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
-                (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));*/
-
-            JMeterVariables var = JMeterContextService.getContext().getVariables();
-           Object testSchema =  JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES);
-            generator.setUpGenerator(
-                    JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
-                    (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+            if (Objects.nonNull(context.getJMeterVariables().get(AVRO_SUBJECT_NAME))) {
+                generator.setUpGeneratorFromRegistry(
+                        JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
+                        (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+            } else if (Objects.nonNull(context.getJMeterVariables().get(AVRO_SCHEMA))) {
+                generator.setUpGenerator(
+                        JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
+                        (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+            } else {
+                log.error("AVRO Subject Name could not be retrieved from Kafka Load Generator Config element nor \n");
+                log.error("AVRO Schema retrieved from Schema File Load Generator Config element \n");
+                throw new KLoadGenException("Kafka Load Generator Config or Schema File Load Generator Config elements unavailable in this test or configured incorrectly." +
+                        " One of these configured correctly is required for the test.");
+            }
 
         } else {
-            generator.setUpGenerator(
-                JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
-                (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+            log.error("The Schema Registry url could not be retrieved from Schema Registry Config Element. Ensure this is present and has a valid url ");
+            throw new KLoadGenException("The Schema Registry url could not be retrieved from Schema Registry Config Element");
+
         }
 
         Iterator<String> parameters = context.getParameterNamesIterator();

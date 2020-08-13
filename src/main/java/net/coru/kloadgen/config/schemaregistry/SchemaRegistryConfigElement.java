@@ -44,6 +44,9 @@ public class SchemaRegistryConfigElement extends ConfigTestElement implements Te
 
   private List<PropertyMapping> schemaRegistryProperties = new ArrayList<>();
 
+  private String listofSchemas ;
+//  private List<String> listofSchemas = new ArrayList<>();
+
   @Override
   public void iterationStart(LoopIterationEvent iterEvent) {
     serializeProperties();

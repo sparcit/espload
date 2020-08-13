@@ -43,7 +43,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
 
   private JComboBox<String> subjectNameComboBox;
 
-//  private final JEditorPane avroSchemaPane = new JEditorPane();
+  private final JEditorPane avroSchemaPane = new JEditorPane();
 
   private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 
@@ -82,7 +82,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     panel.add(subjectNameComboBox);
     AutoCompletion.enable(subjectNameComboBox);
     this.subjectNameComboBox.addActionListener(this);
-//    panel.add(avroSchemaPane, BorderLayout.SOUTH);
+    panel.add(avroSchemaPane, BorderLayout.SOUTH);
   }
   public void actionFileChooser(ActionEvent event) {
 
