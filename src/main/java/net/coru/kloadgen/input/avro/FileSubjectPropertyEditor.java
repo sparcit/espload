@@ -76,13 +76,13 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
   private void init() {
     subjectNameComboBox = new JComboBox<>();
     subjectNameComboBox.setEditable(true);
+    AutoCompletion.enable(subjectNameComboBox);
     panel.setLayout(new BorderLayout());
     openFileDialogButton.addActionListener(this::actionFileChooser);
+    panel.add(subjectNameComboBox, BorderLayout.LINE_START);
     panel.add(openFileDialogButton, BorderLayout.LINE_END);
-    panel.add(subjectNameComboBox);
-    AutoCompletion.enable(subjectNameComboBox);
     this.subjectNameComboBox.addActionListener(this);
-    panel.add(avroSchemaPane, BorderLayout.SOUTH);
+//    panel.add(avroSchemaPane, BorderLayout.SOUTH);
   }
   public void actionFileChooser(ActionEvent event) {
 
@@ -111,7 +111,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
             JOptionPane.ERROR_MESSAGE);
         log.error(e.getMessage(), e);
       }
-      subjectNameComboBox.addFocusListener(new ComboFiller());
+//      subjectNameComboBox.addFocusListener(new ComboFiller());
     }
   }
 
@@ -221,7 +221,7 @@ public class FileSubjectPropertyEditor extends PropertyEditorSupport implements 
     return true;
   }
 
-  class ComboFiller implements FocusListener {
+  class   ComboFiller implements FocusListener {
 
     @Override
     public void focusGained(FocusEvent e) {

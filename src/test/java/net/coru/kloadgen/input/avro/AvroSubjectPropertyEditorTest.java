@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.stream.Stream;
 import net.coru.kloadgen.config.avroserialized.AvroSerializedConfigElement;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
@@ -54,7 +55,7 @@ class AvroSubjectPropertyEditorTest {
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_USERNAME_KEY, "foo");
     JMeterContextService.getContext().getProperties().put(SCHEMA_REGISTRY_PASSWORD_KEY, "foo");
 
-    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement("avroSubject", Collections.emptyList());
+    AvroSerializedConfigElement avroSerializedConfigElement = new AvroSerializedConfigElement(PropsKeysHelper.KEYORVALUE.Value.toString(),"avroSubject", Collections.emptyList());
     JMeterVariables variables = JMeterContextService.getContext().getVariables();
     avroSerializedConfigElement.iterationStart(null);
 

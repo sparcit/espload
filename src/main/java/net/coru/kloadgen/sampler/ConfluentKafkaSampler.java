@@ -35,15 +35,7 @@ import static net.coru.kloadgen.util.ProducerKeysHelper.TOPIC_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.VALUE_NAME_STRATEGY;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS;
 import static net.coru.kloadgen.util.ProducerKeysHelper.ZOOKEEPER_SERVERS_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SCHEMA;
-import static net.coru.kloadgen.util.PropsKeysHelper.AVRO_SUBJECT_NAME;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_DEFAULT;
-import static net.coru.kloadgen.util.PropsKeysHelper.KEYED_MESSAGE_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_KEY_PLACEHOLDER_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MESSAGE_VAL_PLACEHOLDER_KEY;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_KEY_PLACEHOLDER;
-import static net.coru.kloadgen.util.PropsKeysHelper.MSG_PLACEHOLDER;
-import static net.coru.kloadgen.util.PropsKeysHelper.SCHEMA_PROPERTIES;
+import static net.coru.kloadgen.util.PropsKeysHelper.*;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BASIC_TYPE;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_BEARER_KEY;
 import static net.coru.kloadgen.util.SchemaRegistryKeyHelper.SCHEMA_REGISTRY_AUTH_FLAG;
@@ -80,7 +72,6 @@ import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
-import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -94,23 +85,28 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
 
     private static final long serialVersionUID = 1L;
 
-    private KafkaProducer<String, Object> producer;
+//    private KafkaProducer<String, Object> producer;
+    private KafkaProducer<Object, Object> producer;
 
     private String topic;
 
-    private String msg_key_placeHolder;
+    private String messageKey;
 
     private boolean key_message_flag = false;
 
     private final ObjectMapper objectMapperJson = new ObjectMapper();
 
     private final StatelessRandomTool statelessRandomTool;
+//    private final StatelessRandomTool keyRandom;
 
     private final BaseLoadGenerator generator;
+    private final BaseLoadGenerator keyGen;
 
     public ConfluentKafkaSampler() {
         generator = new AvroLoadGenerator();
+        keyGen = new AvroLoadGenerator();
         statelessRandomTool = new StatelessRandomTool();
+//        keyRandom = new StatelessRandomTool();
     }
 
     @Override
@@ -188,14 +184,34 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             }
             props.put(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG, context.getParameter(ENABLE_AUTO_SCHEMA_REGISTRATION_CONFIG));
 
+/*
+            if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
+                key_message_flag= true;
+                messageKey = UUID.randomUUID().toString();
+            }
+*/
+
             if (Objects.nonNull(context.getJMeterVariables().get(AVRO_SUBJECT_NAME))) {
                 generator.setUpGeneratorFromRegistry(
                         JMeterContextService.getContext().getVariables().get(AVRO_SUBJECT_NAME),
                         (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+                if (Objects.nonNull(context.getJMeterVariables().get(KEY_SUBJECT_NAME))) {
+                    key_message_flag = true;
+                    keyGen.setUpGeneratorFromRegistry(
+                            JMeterContextService.getContext().getVariables().get(KEY_SUBJECT_NAME),
+                            (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(KEY_SCHEMA_PROPERTIES));
+                }
+
             } else if (Objects.nonNull(context.getJMeterVariables().get(AVRO_SCHEMA))) {
                 generator.setUpGenerator(
                         JMeterContextService.getContext().getVariables().get(AVRO_SCHEMA),
                         (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(SCHEMA_PROPERTIES));
+                if (Objects.nonNull(context.getJMeterVariables().get(KEY_SCHEMA))) {
+                    key_message_flag= true;
+                    keyGen.setUpGenerator(
+                            JMeterContextService.getContext().getVariables().get(KEY_SCHEMA),
+                            (List<FieldValueMapping>) JMeterContextService.getContext().getVariables().getObject(KEY_SCHEMA_PROPERTIES));
+                }
             } else {
                 log.error("AVRO Subject Name could not be retrieved from Kafka Load Generator Config element nor \n");
                 log.error("AVRO Schema retrieved from Schema File Load Generator Config element \n");
@@ -239,10 +255,6 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
             }
         }
 
-        if (FLAG_YES.equals(context.getParameter(KEYED_MESSAGE_KEY))) {
-            key_message_flag= true;
-            msg_key_placeHolder = UUID.randomUUID().toString();
-        }
 
         topic = context.getParameter(KAFKA_TOPIC_CONFIG);
         producer = new KafkaProducer<>(props);
@@ -255,13 +267,18 @@ public class ConfluentKafkaSampler extends AbstractJavaSamplerClient implements 
         sampleResult.sampleStart();
         JMeterContext jMeterContext = JMeterContextService.getContext();
         EnrichedRecord messageVal = generator.nextMessage();
-        //noinspection unchecked
+        EnrichedRecord messageKey;
+
+
+            //noinspection unchecked
         List<HeaderMapping> kafkaHeaders = safeGetKafkaHeaders(jMeterContext);
         if (Objects.nonNull(messageVal)) {
-            ProducerRecord<String, Object> producerRecord;
+//            ProducerRecord<String, Object> producerRecord;
+            ProducerRecord<Object, Object> producerRecord;
             try {
                 if (key_message_flag) {
-                    producerRecord = new ProducerRecord<>(topic, msg_key_placeHolder, messageVal.getGenericRecord());
+                    messageKey = keyGen.nextMessage();
+                    producerRecord = new ProducerRecord<>(topic, messageKey.getGenericRecord(), messageVal.getGenericRecord());
                 } else {
                     producerRecord = new ProducerRecord<>(topic, messageVal.getGenericRecord());
                 }

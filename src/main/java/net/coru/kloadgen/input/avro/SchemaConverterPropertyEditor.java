@@ -6,7 +6,9 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditorSupport;
 import java.util.Objects;
-import javax.swing.JPanel;
+import javax.swing.*;
+import javax.swing.text.JTextComponent;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.jmeter.gui.ClearGui;
@@ -18,6 +20,8 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
   private PropertyDescriptor propertyDescriptor;
 
   private final JPanel panel = new JPanel();
+
+  private final JEditorPane avroSchemaPane = new JEditorPane();
 
   private String schemaAsString;
 
@@ -44,7 +48,8 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
 
   @Override
   public Component getCustomEditor() {
-    return this.panel;
+//    return this.panel;
+    return this.avroSchemaPane;
   }
 
   @Override
@@ -61,6 +66,10 @@ public class SchemaConverterPropertyEditor extends PropertyEditorSupport impleme
   public void setAsText(String value) throws IllegalArgumentException {
     propertyDescriptor.setValue("schemaAsString", value);
     schemaAsString = value;
+//    JLabel jlabel = new JLabel(schemaAsString);
+//    panel.add(jlabel);
+    avroSchemaPane.setText(schemaAsString);
+
   }
 
   @Override

@@ -4,14 +4,15 @@ import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import net.coru.kloadgen.input.avro.AvroSubjectPropertyEditor;
 import net.coru.kloadgen.model.FieldValueMapping;
+import net.coru.kloadgen.util.PropsKeysHelper;
 import org.apache.jmeter.testbeans.BeanInfoSupport;
 import org.apache.jmeter.testbeans.gui.TableEditor;
 import org.apache.jmeter.testbeans.gui.TypeEditor;
 
 public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
 
+    private static final String KEYORVALUE = "keyorvalue";
     private static final String AVRO_SUBJECT = "avroSubject";
-
     private static final String SCHEMA_PROPERTIES = "schemaProperties";
 
     public AvroSerializedConfigElementBeanInfo() {
@@ -19,8 +20,16 @@ public class AvroSerializedConfigElementBeanInfo extends BeanInfoSupport {
         super(AvroSerializedConfigElement.class);
 
         createPropertyGroup("avro_serialized_load_generator", new String[] {
-            AVRO_SUBJECT, SCHEMA_PROPERTIES
+                KEYORVALUE, AVRO_SUBJECT, SCHEMA_PROPERTIES
         });
+
+        String [] arr = {PropsKeysHelper.KEYORVALUE.Value.toString(), PropsKeysHelper.KEYORVALUE.Key.toString()};
+//    String[] stringArray = Arrays.copyOf(PropsKeysHelper.KEYORVALUE.values(), PropsKeysHelper.KEYORVALUE.values().length, String[].class);
+        PropertyDescriptor placeHolderProps = property(KEYORVALUE,TypeEditor.ComboStringEditor);
+        placeHolderProps.setValue(TAGS, arr);
+        placeHolderProps.setValue(NOT_UNDEFINED, Boolean.TRUE);
+        placeHolderProps.setValue(DEFAULT, PropsKeysHelper.KEYORVALUE.Value.toString());
+        placeHolderProps.setValue(NOT_EXPRESSION, Boolean.TRUE);
 
         TypeEditor tableEditor = TypeEditor.TableEditor;
         PropertyDescriptor tableProperties = property(SCHEMA_PROPERTIES, tableEditor);
