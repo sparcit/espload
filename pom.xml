@@ -2,10 +2,10 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <artifactId>kloadgen</artifactId>
+  <artifactId>espload</artifactId>
 
-  <groupId>net.coru</groupId>
-  <version>2.0.1</version>
+  <groupId>uk.sparcit</groupId>
+  <version>0.1</version>
   <modelVersion>4.0.0</modelVersion>
 
   <build>
@@ -351,7 +351,7 @@
                   <shadedArtifactAttached>true</shadedArtifactAttached>
                   <transformers>
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                      <mainClass>net.coru.kloadgen.KLoadGenStandalone</mainClass>
+                      <mainClass>uk.sparcit.espload.ESPLoadStandalone</mainClass>
                     </transformer>
                   </transformers>
                 </configuration>

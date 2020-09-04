@@ -1,29 +1,31 @@
-# KLoadGen - Kafka + Avro Load Generator
-
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/85c9817742944668b5cc75e3fa1cdb23)](https://app.codacy.com/gh/corunet/kloadgen?utm_source=github.com&utm_medium=referral&utm_content=corunet/kloadgen&utm_campaign=Badge_Grade_Dashboard)
-[![Build Status](https://api.travis-ci.org/corunet/kloadgen.svg?branch=master)](https://travis-ci.org/corunet/kloadgen)
+# ESPLoad - Kafka + Avro Load Generator
 
 ___
 
-KLoadGen is kafka load generator plugin for jmeter designed to work with AVRO schema Registries. It allows to send kafka messages with a structure defined as an AVRO Subject. It connects to the Scheme Registry Server, retrieve the subject to send and generate a random messages every time.
+ESPLoad is a Kafka load generator plugin for jmeter designed to work with AVRO schema Registries. It allows to send kafka messages with a structure defined as an AVRO Subject. It connects to the Scheme Registry Server, retrieve the subject to send and generate a random messages every time.
 
 ## Getting Started
 
 ___
 
-KLoadGen includes four main components
+ESPLoad includes five main components
 
-* **KLoadGen Kafka Sampler** : This jmeter java sampler sends messages to kafka. THere are 3 different samples base on the Serializer class used:
+* **ESPLoad Kafka Samplers** : These Java samplers sends messages to Kafka. THere are 3 different samples base on the Serializer class used:
 
-  * **ConfluentKafkaSampler** : Based on the Confluent Kafka Serializer
+  * **ConfluentKafkaSampler** : Based on the Confluent Kafka Serializer and used for the ESP Avro schema
 
-  * **Kafka Sampler** : Our own and simple Kafka Sampler
+  * **Kafka Sampler** : A simple Kafka Sampler
 
-  * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer is configure by properties.
+  * **Generic Kafka Sampler** : Simple Kafka Sampler where serializer is configured through properties.
 
-  * **KLoadGen Config** : This jmeter config element generates plaintext messages based on input schema template designed.
+* **ESPLoad Registry Schema Selection Config** : This config element provides the schema template extracted from the schema registry and can be used to provide the data for the template which is then used to generate kafka messages. One of either this element or "ESPLoad File Schema Config" is required for ConfluentKafkaSampler to work.  
 
-* **Kafka Headers Config** : This jmeter config element generates serialized object messages based on input class and its property configurations.
+* **ESPLoad File Schema Config** : This config element provides the Avro schema template extracted from a provided schema file and can be used to provide the data for the template which is then used to generate kafka messages. One of either this element or "ESPLoad Registry Schema Selection Config" is required for ConfluentKafkaSampler to work.
+
+* **ESPLoad Registry Connection Config** : This config element is where the schema registry connection settings are provided and is required for the ConfluentKafkaSampler to function.
+
+* **ESPLoad Kafka Headers Config Element** : This config element is optional and provides an option for providing Kafka headers
+
 
 ### Setup
 
@@ -31,7 +33,7 @@ ___
 
 #### Requirement
 
-KLoadGen uses Java, hence on JMeter machine JRE 8 or superior:
+ESPLoad uses Java, hence on JMeter machine JRE 8 or superior:
 
 Install openjdk on Debian, Ubuntu, etc.,
 
@@ -77,9 +79,9 @@ or just
  mvn clean install
 ```
 
-Once build is completed, copy target/kloadgen-plugin-&lt;version&gt;.jar file to JMETER_HOME/lib/ext directory.
+Once build is completed, copy target/ESPLoad-plugin-&lt;version&gt;.jar file to JMETER_HOME/lib/ext directory.
 
-### KLoadGenSampler
+### ConfluentKafkaSampler
 
 * **bootstrap.servers** : broker-ip-1:port, broker-ip-2:port, broker-ip-3:port
 * **zookeeper.servers** : zookeeper-ip-1:port, zookeeper-ip-2:port, zookeeper-ip-3:port. _Optional_
@@ -176,7 +178,7 @@ We will see 4 columns where we will configure the Random Generator system.
 
 ### Schema Template Functions
 
-KLoadGen provides an easy way for random data generation base on the field type.
+ESPLoad provides an easy way for random data generation base on the field type.
 
 #### Data Types
 
@@ -266,7 +268,7 @@ $ mvn -P standalone clean install
 Execution in standalone mode is quite easy :
 
 ```bash
-$ java -jar target/kloadgen-standalone-1.5.1.jar  -h ../JMeter/apache-jmeter-5.2\ 2 -l ../logs/results.log -t ../Example-Test-Plan.jmx -r ../logs
+$ java -jar target/ESPLoadStandalone.jar  -h ../JMeter/apache-jmeter-5.2\ 2 -l ../logs/results.log -t ../Example-Test-Plan.jmx -r ../logs
 ```
 
 ### Configuration Options
@@ -284,4 +286,5 @@ And some optional ones who will let us configura the JMeter Engine and the test 
 
 ## Special Thanks
 
-* We would like to special thanks to [pepper-box](https://github.com/GSLabDev/pepper-box) for give us the base to create this plugin and the main ideas about how to face it.
+
+* A special thanks to [kloadgen](https://github.com/corunet/kloadgen) for providing the foundation to build this plugin
